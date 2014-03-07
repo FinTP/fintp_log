@@ -1,3 +1,23 @@
+/*
+* FinTP - Financial Transactions Processing Application
+* Copyright (C) 2013 Business Information Systems (Allevo) S.R.L.
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>
+* or contact Allevo at : 031281 Bucuresti, 23C Calea Vitan, Romania,
+* phone +40212554577, office@allevo.ro <mailto:office@allevo.ro>, www.allevo.ro.
+*/
+
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -7,11 +27,15 @@
 
 using namespace FinTP;
 
+const string SyslogPublisher::CONFIG_NAME = "Log.PublisherToSyslog";
+const string SyslogPublisher::CONFIG_HOST = "Log.PublisherToSyslog.Host";
+const string SyslogPublisher::CONFIG_PORT = "Log.PublisherToSyslog.Port";
+
 string SyslogPublisher::formatRF3164( const string& theMessage, unsigned int severity )
 {
 #if __STDC_VERSION__ >= 199901L //c99 support is required for %e
 	//the day should be left padded with space not zero(%d), Visual Studio 2010 for example doesn't support %e
-	string time = qPayBase::TimeUtil::Get("%b %e %H:%M:%S", 15);
+	string time = TimeUtil::Get("%b %e %H:%M:%S", 15);
 #else
 	time_t t = time(NULL);
 	tm ts;

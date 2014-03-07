@@ -18,6 +18,16 @@
 * phone +40212554577, office@allevo.ro <mailto:office@allevo.ro>, www.allevo.ro.
 */
 
+#include <xercesc/util/PlatformUtils.hpp>
+
+#include "SyslogPublisher.h"
+#include "XmlUtil.h"
+#include "StringUtil.h"
+#include "Trace.h"
+#include "LogManager.h"
+#include "LogPublisher.h"
+#include "Collaboration.h"
+
 #ifdef WIN32
 	#define __MSXML_LIBRARY_DEFINED__
 	#include <windows.h>
@@ -25,23 +35,6 @@
 #else
 	#include <unistd.h>
 #endif
-
-#include <stdlib.h>
-#include <sstream>
-//#include <fstream>
-
-#include <errno.h>
-
-#include <xercesc/util/PlatformUtils.hpp>
-//#include <xercesc/util/XMLString.hpp>
-
-#include "XmlUtil.h"
-#include "StringUtil.h"
-#include "Trace.h"
-#include "LogManager.h"
-#include "LogPublisher.h"
-//#include "../MQ/TransportHelper.h"
-#include "Collaboration.h"
 
 using namespace std;
 using namespace FinTP;
@@ -372,6 +365,44 @@ void LogManager::Initialize( const NameValueCollection& propSettings, bool threa
 
 					continue;
 				} // endif Log.PublisherToFile
+
+				if ( propSettings[i].first == SyslogPublisher::CONFIG_NAME )
+				{
+					if ( propSettings.ContainsKey( SyslogPublisher::CONFIG_HOST ) )
+					{
+						if ( propSettings.ContainsKey( SyslogPublisher::CONFIG_PORT ) )
+							logPublisher = new SyslogPublisher( propSettings[SyslogPublisher::CONFIG_HOST], propSettings[SyslogPublisher::CONFIG_PORT] );
+						else
+						{
+							TRACE( "Missing " << SyslogPublisher::CONFIG_PORT << " in config file. Assuming UDP port 514." )
+							logPublisher = new SyslogPublisher( propSettings[SyslogPublisher::CONFIG_HOST] );
+						}
+					}
+					else
+					{
+						AppException ex( "Missing " +  SyslogPublisher::CONFIG_HOST + " for Syslog publisher in config file." );
+						Instance.InternalPublish( ex );
+						continue;
+					}
+					if ( propSettings[i].second == "true" )
+					{
+						DEBUG_GLOBAL( "Added Syslog publisher." );
+						Instance.m_Publishers.push_back( logPublisher );
+					}
+					else
+						if ( propSettings[i].second == "default" )
+						{
+							DEBUG_GLOBAL( "Added Syslog publisher as default log publisher." )
+							Instance.setDefaultPublisher( logPublisher );
+						}
+						else
+						{
+							// not activated and not default... why is it even there ?
+							delete logPublisher;
+							logPublisher = NULL;
+						}
+					continue;
+				}
 			}
 			catch( const AppException& e )
 			{

@@ -39,6 +39,9 @@
     <ClInclude Include="src\DumpContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\SyslogPublisher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AbstractLogPublisher.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DllMainLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SyslogPublisher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
